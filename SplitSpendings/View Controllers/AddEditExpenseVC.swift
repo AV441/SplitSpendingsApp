@@ -35,7 +35,7 @@ class AddEditExpenseVC: UIViewController {
     let payerPickerCellIndexPath = IndexPath(row: 1, section: 2)
     
     var isSplitEqualy = false
-    var isDatePickerIsVisible = false
+    var isDatePickerVisible = false
     var isPayerPickerVisible = false
     
     private let tableView: UITableView = {
@@ -356,8 +356,7 @@ extension AddEditExpenseVC: UITableViewDataSource {
             case 1:
                 let cell = tableView.dequeueReusableCell(withIdentifier: DatePickerCell.identifier, for: indexPath) as! DatePickerCell
                 cell.datePicker.addTarget(self, action: #selector(updateDateLabel), for: .valueChanged)
-                cell.isHidden = true
-                
+ 
                 if let expense = expense {
                     cell.datePicker.date = expense.date
                 }
@@ -382,7 +381,6 @@ extension AddEditExpenseVC: UITableViewDataSource {
                 let cell = tableView.dequeueReusableCell(withIdentifier: PickerViewCell.identifier, for: indexPath) as! PickerViewCell
                 cell.pickerView.delegate = self
                 cell.pickerView.dataSource = self
-                cell.isHidden = true
                 
                 if let expense = expense {
                     if let indexOfPayer = accounts[indexOfCurrentAccount].participants.firstIndex(where: { $0.name == expense.payer.name }) {
@@ -427,7 +425,7 @@ extension AddEditExpenseVC: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath {
         case datePickerCellIndexPath:
-            return isDatePickerIsVisible ? 216 : 0
+            return isDatePickerVisible ? 216 : 0
         case payerPickerCellIndexPath:
             return isPayerPickerVisible ? 216 : 0
         default:
@@ -439,21 +437,16 @@ extension AddEditExpenseVC: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if indexPath == datePickerLabelIndexPath {
-            guard let cell = tableView.cellForRow(at: datePickerCellIndexPath) else { return }
-            cell.isHidden.toggle()
-            isDatePickerIsVisible.toggle()
-        }
-        
-        if indexPath == payerPickerLabelIndexPath {
-            guard let cell = tableView.cellForRow(at: payerPickerCellIndexPath) else { return }
-            cell.isHidden.toggle()
-            isPayerPickerVisible.toggle()
-        }
-        
-        tableView.beginUpdates()
-        tableView.endUpdates()
-    }    
+            if indexPath == datePickerLabelIndexPath {
+                isDatePickerVisible.toggle()
+                tableView.reloadRows(at: [datePickerCellIndexPath], with: .automatic)
+            }
+            
+            if indexPath == payerPickerLabelIndexPath {
+                isPayerPickerVisible.toggle()
+                tableView.reloadRows(at: [payerPickerCellIndexPath], with: .automatic)
+            }
+    }
 }
 
 //MARK: - UIPickerViewDataSource -
@@ -530,7 +523,6 @@ extension AddEditExpenseVC {
         guard let cell = tableView.cellForRow(at: datePickerLabelIndexPath) as? LabelCell else { return }
         cell.label.text = datePicker.date.formatted
         self.date = datePicker.date
-        print(self.date)
     }
     
     //MARK: splitEqualyButtonPressed
