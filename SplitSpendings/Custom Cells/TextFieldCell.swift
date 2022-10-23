@@ -41,7 +41,6 @@ class TextFieldCell: UITableViewCell {
         case .totalCell:
             textField.placeholder = "Сумма"
             textField.keyboardType = .numbersAndPunctuation
-            //            textField.addTarget(self, action: #selector(handleValueChange), for: .editingChanged)
             
             if let expense = expense {
                 textField.text = String(expense.total)

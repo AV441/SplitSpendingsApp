@@ -405,6 +405,12 @@ extension AddEditExpenseVC: UITableViewDataSource {
             default:
                 let cell = tableView.dequeueReusableCell(withIdentifier: TextFieldCell.identifier, for: indexPath) as! TextFieldCell
                 cell.configure(.personalExpenseCell, with: expense, for: indexPath)
+                
+                if let savedSpending = personalSpendings[currentAccount.participants[indexPath.row - 1].name] {
+                    cell.textField.text = String(savedSpending)
+                    print(savedSpending)
+                }
+                
                 cell.textField.tag = indexPath.row - 1
                 cell.textField.addTarget(self, action: #selector(participantsSpendingsChanged(textField:)), for: .editingChanged)
                 cell.textField.delegate = self
