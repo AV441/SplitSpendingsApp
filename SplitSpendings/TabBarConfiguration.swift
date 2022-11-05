@@ -40,6 +40,14 @@ func createTabBarController() -> UITabBarController {
     /// }
     /// ```
     /// Иконки можно выносить в отдельный `extention UIImage` для всего приложения, тк они обычно переиспользуются
+    ///
+    /// Для текстов, которые шарятся на все приложение можно завести что-то тип
+    /// ```
+    /// struct Texts {
+    ///     static let textA = ""
+    ///     static let textB = ""
+    /// }
+    /// ```
     let item1 = UITabBarItem(title: "Совместные счета", image: UIImage(systemName: "square.grid.2x2.fill"), tag: 0)
     let item2 = UITabBarItem(title: "Текущий счет", image:  UIImage(systemName: "person.3.fill"), tag: 1)
     let item3 = UITabBarItem(title: "История трат", image:  UIImage(systemName: "list.dash"), tag: 2)

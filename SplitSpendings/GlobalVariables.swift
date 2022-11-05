@@ -34,6 +34,7 @@ let personsHasBeenChangedNotification = NSNotification.Name(rawValue: "personsHa
 let appHasBeenEnteredBackground = NSNotification.Name(rawValue: "appHasBeenEnteredBackground")
 
 /// Такой код - явный признак, что нужно что-то, что будет загружать счета.
+/// Это некоторое глабальное свойство, которое ты неявно используешь в котнроллерах.
 var accounts = [Account]() {
     didSet {
         Account.save(accounts)
@@ -41,4 +42,5 @@ var accounts = [Account]() {
 }
 
 /// Аналогично - это глобальная константа, причем, она описывает стейт (состояние) - текущих выбранный счет. Должно быть что-то, что отвечает за это.
+/// Причем, внутри котнроллера, который это требует.
 var indexOfCurrentAccount: Int = 0
