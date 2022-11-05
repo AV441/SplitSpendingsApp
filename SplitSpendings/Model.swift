@@ -7,6 +7,11 @@
 
 import Foundation
 
+/// Как и писал в `AppDelegate`, модель аккаунта не должна содерждать никакой логики. Только поля с `title` по `id`
+/// Т.е. методы `load`, `save` должны быть методами отдельной сущности, которая работает с аккаунтом
+///
+/// Кстати, мне кажется, что название модели не отражает ее назначение. Обычно аккаут - это аккаунт пользователя приложения.
+/// В данном случае - это совместный счет. Сильно путает.
 struct Account: Codable, Equatable {
     static func == (lhs: Account, rhs: Account) -> Bool {
        return lhs.id == rhs.id
@@ -24,7 +29,19 @@ struct Account: Codable, Equatable {
         self.participants = []
         self.expenses = []
     }
-    
+
+    /// Не могу комментировать выбранный способ сохранения данных, но строка ниже используется 2 раза: для `Account` и для `Person`
+    /// Когда ты вынесешь логику сохранение / загрузки в отдельную сущность, можно будет добавить следующее
+    /// ```
+    /// class AccountStorage {
+    ///    ...
+    ///    использование FileManager.defaultDirectory
+    ///    ...
+    /// }
+    /// private extension FileManager {
+    ///     var defaultDirectory = .default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    /// }
+    /// ```
     static let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     static let archiveURL = documentsDirectory.appendingPathComponent("accounts").appendingPathExtension("plist")
     
@@ -41,6 +58,7 @@ struct Account: Codable, Equatable {
     }
 }
 
+/// Не держи все модели в одном файле. Можно группировать их по смыслу: аккаунт / траты и тд
 enum Currency: String, Codable, CaseIterable {
     case rub = "₽"
     case kzt = "₸"
@@ -65,6 +83,9 @@ struct Person: Codable {
     var name: String
     var expenses: [PersonalExpense]
     var balance: Double {
+        /// Моё почтение за использование `reduce`.
+        /// Но если прям докапываться, то тут есть неоптимальный момент: ты проходишься по массиву 2 раза.
+        /// В данном случае это экономия на спичках, но через `for` это будет в 2 раза быстрее, хоть и не так красиво.
         let totalSpendings = expenses.reduce(0) { $0 + $1.spendings }
         let totalPayments = expenses.reduce(0) { $0 + $1.payments }
         return totalPayments - totalSpendings
@@ -83,3 +104,5 @@ struct PersonalExpense: Codable {
     let date: Date
     let id: UUID
 }
+
+/// Коммент ко всем моделям выше:  в них должны быть только хранимые св-ва и вычисляемые св-ва. (stored / calculated roperties), никаких методов / статичных св-тв.

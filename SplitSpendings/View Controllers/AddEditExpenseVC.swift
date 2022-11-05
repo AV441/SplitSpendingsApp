@@ -11,8 +11,10 @@ enum CellType {
     case totalCell, detailsCell, personalExpenseCell, dateLabelCell, payerLabelCell
 }
 
+/// `final`
 class AddEditExpenseVC: UIViewController {
-    
+
+/// Все `private`
     var currentAccount = accounts[indexOfCurrentAccount]
     
     var total: Double = 0

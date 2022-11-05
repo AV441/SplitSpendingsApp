@@ -22,7 +22,11 @@ class AddNewAccountCell: UICollectionViewCell {
         button.layer.cornerRadius = 20
         return button
     }()
-    
+
+    /// Почитай, что это за местод и сколько раз он может вызываться
+    /// Можешь поставить тут брейкоинт и посмотреть сам.
+    /// Эта конфигурация должна быть в другом методе
+    /// Коммент актуален ко всем твоим ячейкам с `layoutSubviews`
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.addSubview(button)

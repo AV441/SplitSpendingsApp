@@ -11,7 +11,12 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+
+        /// Аккаунт должен быть простой моделью: структура с набором полей, без логики.
+        /// Функция загрузки - это логика.
+        /// Загрузкой аккаунта должна заниматься отдельная сущность, назначение которой: операции с моделью `Account` (сохранение, загрузка, обновление). Допустим, `AccountStorage`
+        ///
+        /// UPD: из-за нейминга, тут почти невозможно понять, что просходит загрузка совместных счетов.
         if let loadedAccounts = Account.load() {
             accounts = loadedAccounts
         }
