@@ -71,7 +71,7 @@ class PersonCell: UITableViewCell {
         shape.lineWidth = 1.0
         chartView.layer.addSublayer(shape)
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
         stackView.addArrangedSubview(nameLabel)
