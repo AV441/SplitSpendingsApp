@@ -12,7 +12,9 @@ class BalancesVC: UIViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
+
+    /// Я видел такое использование замыканий для создания и настройки свойств, но это неочень практично.
+    /// Если кол-во свойств вырастет, то визуально ты не сможешь оценить свойства / зависимости контроллера
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -31,7 +33,8 @@ class BalancesVC: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+
+    /// `Private`?
     let rightButton = UIButton(type: .system)
     let leftButton = UIButton(type: .system)
     
@@ -40,7 +43,12 @@ class BalancesVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureNavigationBar()
-        
+
+        /// Это тоже неявная зависимость
+        /// Минимум, стоит объявить новое свойство в котнроллере:
+        /// `private let notificationCenter: NotificationCenter = .default`
+        /// Так, взглянув на объявление контроллера, ты поймешь, что внутри он использует `NotificationCenter`
+        /// Но вообще, для этого исползуют `dependency injection` (внедрение зависимостей) Почитай об этом
         NotificationCenter.default.addObserver(self, selector: #selector(updateTableView), name: personsHasBeenChangedNotification, object: nil)
     }
     
@@ -48,6 +56,10 @@ class BalancesVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
+        /// Странно, что на `viewWillAppear` происходят такие действия. Это должно быть во `viewDidLoad`
+        /// Если требуется что-то обновить по отображени модуля, то делать это нужно иначе.
+        /// Тут же у тебя реально каждый раз при переходе на этот котнроллер будет происходить полная перенастройка
         tableView.removeFromSuperview()
         
         switch accounts.isEmpty {
@@ -103,7 +115,7 @@ class BalancesVC: UIViewController {
         navigationItem.title = "Текущий счет"
         view.backgroundColor = .white
         view.addSubview(messageLabel)
-        
+
         NSLayoutConstraint.activate([
             messageLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             messageLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
@@ -134,6 +146,8 @@ extension BalancesVC: UITableViewDataSource {
     
     //MARK: numberOfRowsInSection
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        /// Аккаунта и участника нет в списке свойств контроллера. Это неявная зависимость.
+        /// Надо решить проблему, явно указав все среди свойств.
         let numberOfParticipantsInCurrentAccount = accounts[indexOfCurrentAccount].participants.count
         return numberOfParticipantsInCurrentAccount + 1
     }
@@ -141,7 +155,8 @@ extension BalancesVC: UITableViewDataSource {
     //MARK: cellForRowAt
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let numberOfParticipantsInCurrentAccount = accounts[indexOfCurrentAccount].participants.count
-        
+
+        /// Коммент про такое использование `switch` бы в `AccountsVC`
         switch indexPath.row {
             
         //AddPersonCell
@@ -162,6 +177,9 @@ extension BalancesVC: UITableViewDataSource {
     
     //MARK: heightForRowAt
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        /// Если что, то есть UITableView.automaticDimension - это значение поумолчанию.
+        /// Если внутри ячеек используешь констрейнты (есть еще пара вариантов), то высоты считаются автоматически
+
         switch indexPath.row {
         case accounts[indexOfCurrentAccount].participants.count:
             return 60
@@ -189,6 +207,18 @@ extension BalancesVC: UITableViewDelegate {
                 tableView.deleteRows(at: [indexPath], with: .automatic)
                 changeBarButtonsStatus()
             } else {
+                /// Смотри, у тебя в каждом модуле есть отображение алертов. Конфигурация алерта занимает много места.
+                /// Можно создать фабрику алертов и использоваться ее внутри контроллеров.
+                /// Например, создаешь перечисление отображаемых алертов
+                /// ```
+                /// enum AlertScenario {
+                ///    case forbiddenParticipantDeleteOperation
+                /// }
+                /// ```
+                /// Создаешь фабрику `struct SimpleAlertsFactory`, у которой есть метод `func createAlert(for scenario: AlertScenario) -> UIAlertController`
+                /// и используешь ее тут (объявив среди свойств контроллера)
+                /// Если у алерта есть экшены, то можно добавить еще один метод, который помимо типа сценария на вход вринимает замыкания (closures) для реакции на выбор варианта)
+                ///
                 let alert = UIAlertController(title: "Нельзя удалить данного участника",
                                               message: "Удаление участника приведет к ошибкам в расчетах, т.к. у него имеются текущие расходы",
                                               preferredStyle: .alert)

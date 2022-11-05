@@ -16,6 +16,7 @@ fileprivate enum SortingType {
     case dateAscending, dateDescending
 }
 
+/// Это должно быть внутри `HistoryVC`
 fileprivate var sections = [Section]()
 fileprivate var sortingType: SortingType = .dateDescending
 

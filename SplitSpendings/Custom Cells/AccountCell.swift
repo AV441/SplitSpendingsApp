@@ -11,6 +11,28 @@ protocol AccountCellDelegate: AnyObject {
     func deleteAccount(sender: AccountCell)
 }
 
+/// Вижу, что xib ты не любишь. Но реальность такова: лэйаут у ячейки простой, а кода конфиругации тут на 100 строк.
+/// Т.е. если конфигурация ячейки будет сложнее, то > 500 строк - это пиздец. С этим трудно работать и еще труднее поддерживать.
+///
+/// Как вариант оптимизации: можно уйти от копипасты и сделать что-то типа
+/// ```
+/// extionsion IULabel {
+///    static func createInstance(fontSize: CGFloat, weight: UIFont.Weight, numberOfLines: Int) -> UILabel {
+///        let label = UILabel()
+///        label.translatesAutoresizingMaskIntoConstraints = false
+///        label.font = .systemFont(ofSize: fontSize, weight: .weight)
+///        label.numberOfLines = numberOfLines
+///        return label
+///    }
+/// }
+/// ```
+/// и использовать
+/// ```
+/// private let titleLabel: UILabel = .createInstance(...)
+/// private let totalLabel: UILabel = .createInstance(...)
+/// ```
+/// И так для всех визаульных элементов, настройка которых - копипаста.
+/// 
 class AccountCell: UICollectionViewCell {
     
     static let identifier = "AccountCell"
